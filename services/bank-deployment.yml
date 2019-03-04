@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: bank
+  name: bank
+spec:
+  ports:
+    - port: 27018
+  selector:
+    app: bank
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bank
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: bank
+        image: harbor.lab01.pcf.pw/adv/bank:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 27018
+        env:
+        - name: SPRING_DATA_MONGODB_PASSWORD
+          value: pivotal123
+        - name: SPRING_DATA_MONGODB_USERNAME
+          value: pivotal
+        - name: SPRING_DATA_MONGODB_URI
+          value: mongodb://35.189.111.26:27017/pivotal
+#kubectl patch svc <svc-name> -n <namespace> -p '{"spec": {"type": "LoadBalancer", "externalIPs":["172.31.71.218"]}}'
